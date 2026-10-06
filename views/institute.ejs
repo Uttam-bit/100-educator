@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title><%= institute.name %> | 100 Educator</title>
+
+    <link rel="stylesheet" href="/css/style.css">
+</head>
+
+<body>
+
+    <header class="site-header">
+        <div class="logo">
+            <a href="/">
+    <img src="/image/100-educators-logo.jpeg" alt="100 Educator">
+</a>
+        </div>
+
+        <nav>
+            <a href="/">Home</a>
+            <a href="/explore">Explore</a>
+            <a href="/categories">Categories</a>
+            <a href="/institutes">For Institutes</a>
+            <a href="/about">About</a>
+        </nav>
+    </header>
+
+
+    <main class="institute-details">
+
+        <div class="details-card">
+
+            <span class="institute-label">
+                <%= institute.type === "government" ? "GOVERNMENT" : "PRIVATE" %>
+            </span>
+
+            <h1><%= institute.name %></h1>
+
+            <p class="details-category">
+                <%= institute.category %>
+            </p>
+
+            <div class="details-info">
+
+                <p>
+                    📚 <strong>Course:</strong>
+                    <%= institute.course %>
+                </p>
+
+                <p>
+                    📍 <strong>Location:</strong>
+                    <%= institute.city %>
+                    <% if (institute.area) { %>
+                        · <%= institute.area %>
+                    <% } %>
+                </p>
+
+                <p>
+                    🏠 <strong>Address:</strong>
+                    <%= institute.address %>
+                </p>
+
+                <p>
+                    💰 <strong>Fees:</strong>
+               
+                </p>
+
+                <p class="institute-rating">
+                    ⭐ <stron<% if (institute.is_free === "true") { %>
+    Free
+<% } else if (institute.fees) { %>
+    ₹<%= institute.fees %>
+<% } else { %>
+    Fees not available
+<% } %>g><%= institute.rating %></strong>/5
+                    · <%= institute.reviews %> reviews
+                </p>
+<p class="educator-score">
+    🎯 <strong>100 Educator Score: <%= institute.score %></strong>/100
+</p>
+
+<% if (institute.scoreProvisional) { %>
+    <p class="provisional-score">
+        Provisional Score
+    </p>
+<% } %>
+                <p>
+                    📞 <strong>Phone:</strong>
+                    <%= institute.phone %>
+                </p>
+
+            </div>
+
+
+            <% if (institute.verified === "true") { %>
+                <p class="verified-badge">
+                    ✓ Verified Institute
+                </p>
+            <% } %>
+
+
+           <% if (institute.website) { %>
+    <a
+        href="<%= institute.website %>"
+        target="_blank"
+        rel="noopener noreferrer"
+        class="details-button"
+    >
+        Visit Website →
+    </a>
+<% } else { %>
+    <p class="website-unavailable">
+        Website not available
+    </p>
+<% } %>
+
+            <a href="/explore" class="back-button">
+                ← Back to Explore
+            </a>
+
+        </div>
+
+    </main>
+
+</body>
+</html>

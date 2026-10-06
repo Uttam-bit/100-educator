@@ -1,0 +1,14 @@
+{
+  "name": "100-educator",
+  "version": "1.0.0",
+  "description": "100 Educator - Coaching and Skill Discovery Platform",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js"
+  },
+  "dependencies": {
+    "csv-parse": "^7.0.2",
+    "ejs": "^3.1.10",
+    "express": "^5.1.0"
+  }
+}

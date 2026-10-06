@@ -1,0 +1,301 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Explore | 100 Educators</title>
+
+    <link rel="stylesheet" href="/css/style.css">
+
+</head>
+
+<body>
+
+<header>
+
+    <a href="/" class="logo">
+        <img
+            src="/image/100-educators-logo.jpeg"
+            alt="100 Educators"
+        >
+    </a>
+
+    <nav>
+<a href="/">Home</a>
+        <a href="/explore" target="_blank">
+            Explore
+        </a>
+
+        <a href="/categories" target="_blank">
+            Categories
+        </a>
+
+        <a href="/institutes" target="_blank">
+            For Institutes
+        </a>
+
+        <a href="/about" target="_blank">
+            About
+        </a>
+
+    </nav>
+
+</header>
+
+
+<main>
+
+    <section class="hero">
+
+        <p class="hero-label">
+            EXPLORE LEARNING
+        </p>
+
+        <h1>
+            Find what you<br>
+            want to learn.
+        </h1>
+
+        <p class="hero-text">
+            Explore coaching centres, training institutes and
+            learning opportunities across different subjects,
+            skills and career paths.
+        </p>
+
+        <p class="hero-text">
+
+            <% if (locals.skill || locals.location) { %>
+
+                Searching for
+                <strong>
+                    <%= locals.skill || "all learning" %>
+                </strong>
+
+                <% if (locals.location) { %>
+
+                    in
+                    <strong>
+                        <%= locals.location %>
+                    </strong>
+
+                <% } %>
+
+            <% } %>
+
+        </p>
+
+    </section>
+
+
+    <section class="results-section">
+
+        <div class="results-header">
+
+            <p class="hero-label">
+                SEARCH RESULTS
+            </p>
+
+            <h2>
+
+                <% if (locals.skill || locals.location) { %>
+
+                    Results for
+                    <%= locals.skill || "All learning" %>
+
+                    <% if (locals.location) { %>
+
+                        in
+                        <%= locals.location %>
+
+                    <% } %>
+
+                <% } else { %>
+
+                    Explore learning options
+
+                <% } %>
+
+            </h2>
+
+        </div>
+
+
+        <div class="results-empty">
+
+            <% if ((locals.filteredInstitutes || []).length === 0) { %>
+
+                <h3>
+                    No institutes found for this search
+                </h3>
+
+                <p>
+                    Try another course, skill or location.
+                </p>
+
+            <% } else { %>
+
+
+                <% filteredInstitutes.forEach(institute => { %>
+
+                    <div class="institute-card">
+
+
+                        <span class="institute-label">
+
+                            <%= institute.type === "government"
+                                ? "GOVERNMENT"
+                                : "PRIVATE"
+                            %>
+
+                        </span>
+
+
+                        <h3>
+                            <%= institute.name %>
+                        </h3>
+
+
+                        <p>
+
+                            <strong>
+                                Course:
+                            </strong>
+
+                            <%= institute.course || "Training / Coaching" %>
+
+                        </p>
+
+
+                        <% if (institute.skills) { %>
+
+                            <p>
+
+                                <strong>
+                                    Skills:
+                                </strong>
+
+                                <%= institute.skills %>
+
+                            </p>
+
+                        <% } %>
+
+
+                        <p class="institute-location">
+
+                            📍
+                            <%= institute.city || "" %>
+
+                            <% if (institute.area) { %>
+
+                                · <%= institute.area %>
+
+                            <% } %>
+
+                        </p>
+
+
+                        <% if (String(institute.is_free).toLowerCase() === "true") { %>
+
+                            <p class="institute-fees">
+                                💰 Free
+                            </p>
+
+                        <% } else if (
+                            institute.fees !== undefined &&
+                            institute.fees !== null &&
+                            String(institute.fees).trim() !== ""
+                        ) { %>
+
+                            <p class="institute-fees">
+                                💰 ₹<%= institute.fees %>
+                            </p>
+
+                        <% } %>
+
+
+                        <% if (
+                            institute.rating !== undefined &&
+                            institute.rating !== null &&
+                            String(institute.rating).trim() !== ""
+                        ) { %>
+
+                            <p class="institute-rating">
+
+                                ⭐
+                                <strong>
+                                    <%= institute.rating %>
+                                </strong>/5
+
+                                <% if (
+                                    institute.reviews !== undefined &&
+                                    institute.reviews !== null &&
+                                    String(institute.reviews).trim() !== ""
+                                ) { %>
+
+                                    <span>
+                                        · <%= institute.reviews %> reviews
+                                    </span>
+
+                                <% } %>
+
+                            </p>
+
+                        <% } %>
+
+
+                      <% if (institute.scoreProvisional) { %>
+    <p class="provisional-score">
+        Provisional Score
+    </p>
+<% } %>
+
+                        <% if (institute.scoreProvisional) { %>
+
+                            <p class="provisional-score">
+                                Provisional Score
+                            </p>
+
+                        <% } %>
+
+
+                        <% if (institute.verified === "true") { %>
+
+                            <p class="verified-badge">
+                                ✓ Verified Institute
+                            </p>
+
+                        <% } %>
+
+
+                        <a
+                            href="/institute/<%= encodeURIComponent(institute.name) %>"
+                            target="_blank"
+                            class="institute-link"
+                        >
+
+                            View Details →
+
+                        </a>
+
+
+                    </div>
+
+                <% }) %>
+
+
+            <% } %>
+
+        </div>
+
+    </section>
+
+</main>
+
+</body>
+
+</html>
