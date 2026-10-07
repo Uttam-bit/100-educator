@@ -2,9 +2,46 @@ const express = require("express");
 const path = require("path");
 const fs = require("fs");
 const { parse } = require("csv-parse/sync");
+require("dotenv").config();
+const mysql = require("mysql2/promise");
+const session = require("express-session");
 
 const app = express();
 const PORT = 3000;
+// ==============================
+// MYSQL DATABASE
+// ==============================
+
+const db = mysql.createPool({
+  host: process.env.DB_HOST,
+  user: process.env.DB_USER,
+  password: process.env.DB_PASSWORD,
+  database: "100_educators",
+  port: Number(process.env.DB_PORT) || 18056,
+  ssl: {
+    rejectUnauthorized: false
+  }
+});
+app.use(
+  express.static(
+    path.join(
+      __dirname,
+      "public"
+    )
+  )
+);
+app.use(express.urlencoded({ extended: true }));
+app.use(
+  session({
+    secret: "100-educators-admin-secret",
+    resave: false,
+    saveUninitialized: false,
+    cookie: {
+      httpOnly: true,
+      secure: false
+    }
+  })
+);
 
 const csvFilePath = path.join(
   __dirname,
@@ -1086,7 +1123,246 @@ app.get(
   }
 );
 
+// ==============================
+// CONTACT US
+// ==============================
 
+app.get(
+  "/contact",
+  (req, res) => {
+
+    res.render(
+      "contact"
+    );
+
+  }
+);
+
+// ==============================
+// ADMIN LOGIN
+// ==============================
+
+app.get("/admin/login", (req, res) => {
+
+  res.render("admin-login", {
+    error: ""
+  });
+
+});
+
+app.post("/admin/login", (req, res) => {
+
+  const { email, password } = req.body;
+
+  if (
+  email === process.env.ADMIN_EMAIL &&
+  password === process.env.ADMIN_PASSWORD
+) {
+
+    req.session.isAdmin = true;
+
+    return res.redirect("/admin/queries");
+
+  }
+
+  res.render("admin-login", {
+    error: "Invalid email or password."
+  });
+
+});
+function requireAdmin(req, res, next) {
+
+  if (!req.session.isAdmin) {
+    return res.redirect("/admin/login");
+  }
+
+  next();
+}
+
+// ==============================
+// ADMIN LOGOUT
+// ==============================
+
+app.get(
+  "/admin/logout",
+  requireAdmin,
+  (req, res) => {
+
+    req.session.destroy(() => {
+
+      res.redirect("/admin/login");
+
+    });
+
+  }
+);
+
+// ==============================
+// ADMIN CONTACT QUERIES
+// ==============================
+
+app.get(
+  "/admin/queries",
+  requireAdmin,
+  async (req, res) => {
+
+    try {
+
+      const [queries] =
+        await db.execute(
+          `SELECT *
+           FROM contact_queries
+           ORDER BY id DESC`
+        );
+
+      res.render(
+        "admin-queries",
+        {
+          queries
+        }
+      );
+
+    } catch (error) {
+
+      console.error(
+        "Admin queries error:",
+        error
+      );
+
+      res.status(500).send(
+        "Unable to load contact queries."
+      );
+
+    }
+
+  }
+);
+// ==============================
+// CONTACT FORM SUBMISSION
+// ==============================
+
+app.post(
+  "/contact",
+  async (req, res) => {
+
+    try {
+
+      const {
+        name,
+        email,
+        subject,
+        message
+      } = req.body;
+
+
+      await db.execute(
+        `INSERT INTO contact_queries
+        (name, email, subject, message)
+        VALUES (?, ?, ?, ?)`,
+        [
+          name,
+          email,
+          subject,
+          message
+        ]
+      );
+
+
+      res.send(`
+        <script>
+          alert("Your message has been sent successfully.");
+          window.location.href = "/contact";
+        </script>
+      `);
+
+    } catch (error) {
+
+      console.error(
+        "Contact form error:",
+        error
+      );
+
+
+      res.status(500).send(
+        "Something went wrong. Please try again."
+      );
+
+    }
+
+  }
+);
+// ==============================
+// UPDATE QUERY STATUS
+// ==============================
+
+app.post(
+  "/admin/queries/:id/status",
+  requireAdmin,
+  async (req, res) => {
+
+    try {
+
+      const { status } = req.body;
+
+      await db.execute(
+        `UPDATE contact_queries
+         SET status = ?
+         WHERE id = ?`,
+        [status, req.params.id]
+      );
+
+      res.redirect("/admin/queries");
+
+    } catch (error) {
+
+      console.error(
+        "Query status error:",
+        error
+      );
+
+      res.status(500).send(
+        "Unable to update query status."
+      );
+
+    }
+
+  }
+);
+
+// ==============================
+// DELETE CONTACT QUERY
+// ==============================
+
+app.post(
+  "/admin/queries/:id/delete",
+  requireAdmin,
+  async (req, res) => {
+
+    try {
+
+      await db.execute(
+        `DELETE FROM contact_queries
+         WHERE id = ?`,
+        [req.params.id]
+      );
+
+      res.redirect("/admin/queries");
+
+    } catch (error) {
+
+      console.error(
+        "Delete query error:",
+        error
+      );
+
+      res.status(500).send(
+        "Unable to delete query."
+      );
+
+    }
+
+  }
+);
 // ==============================
 // INDIVIDUAL INSTITUTE
 // ==============================

@@ -1,0 +1,266 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta name="viewport"
+          content="width=device-width, initial-scale=1.0">
+
+    <title>Contact Queries | 100 Educators</title>
+
+    <style>
+
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            margin: 0;
+            font-family: Arial, sans-serif;
+            background: #f5f7fa;
+            color: #222;
+        }
+
+        .admin-header {
+            background: #111827;
+            color: white;
+            padding: 20px 6%;
+        }
+
+        .admin-header h1 {
+            margin: 0;
+            font-size: 25px;
+        }
+
+        .admin-header p {
+            margin: 6px 0 0;
+            color: #cbd5e1;
+        }
+
+        .container {
+            width: 88%;
+            max-width: 1400px;
+            margin: 35px auto;
+        }
+
+        .table-box {
+            background: white;
+            border-radius: 12px;
+            overflow-x: auto;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.08);
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            min-width: 900px;
+        }
+
+        th,
+        td {
+            padding: 15px;
+            text-align: left;
+            border-bottom: 1px solid #e5e7eb;
+        }
+
+        th {
+            background: #f1f5f9;
+            font-size: 14px;
+        }
+
+        td {
+            font-size: 14px;
+            vertical-align: top;
+        }
+
+        .status {
+            display: inline-block;
+            padding: 5px 10px;
+            border-radius: 20px;
+            background: #fff3cd;
+            color: #856404;
+            font-size: 12px;
+            font-weight: bold;
+        }
+
+        .message {
+            max-width: 300px;
+            white-space: normal;
+            line-height: 1.5;
+        }
+
+        .empty {
+            text-align: center;
+            padding: 40px;
+            color: #777;
+        }
+
+    </style>
+
+</head>
+
+<body>
+
+    <div class="admin-header">
+
+        <h1>100 Educators — Contact Queries</h1>
+
+        <p>Manage messages submitted through the Contact Us form.</p>
+        <a
+    href="/admin/logout"
+    style="
+        display: inline-block;
+        margin-top: 15px;
+        padding: 9px 16px;
+        background: white;
+        color: #111827;
+        text-decoration: none;
+        border-radius: 6px;
+        font-weight: bold;
+        font-size: 14px;
+    "
+>
+    Logout
+</a>
+
+    </div>
+
+
+    <div class="container">
+
+        <div class="table-box">
+
+            <% if (queries.length === 0) { %>
+
+                <div class="empty">
+                    No contact queries found.
+                </div>
+
+            <% } else { %>
+
+                <table>
+
+                    <thead>
+
+                        <tr>
+                            <th>ID</th>
+                            <th>Name</th>
+                            <th>Email</th>
+                            <th>Subject</th>
+                            <th>Message</th>
+                            <th>Status</th>
+                            <th>Date</th>
+                            <th>Action</th>
+                        </tr>
+
+                    </thead>
+
+                    <tbody>
+
+                        <% queries.forEach(query => { %>
+
+                            <tr>
+
+                                <td>
+                                    <%= query.id %>
+                                </td>
+
+                                <td>
+                                    <%= query.name %>
+                                </td>
+
+                                <td>
+                                    <%= query.email %>
+                                </td>
+
+                                <td>
+                                    <%= query.subject %>
+                                </td>
+
+                                <td class="message">
+                                    <%= query.message %>
+                                </td>
+
+                            <td>
+
+    <form
+        action="/admin/queries/<%= query.id %>/status"
+        method="POST"
+    >
+
+        <select
+            name="status"
+            onchange="this.form.submit()"
+        >
+
+            <option
+                value="New"
+                <%= query.status === "New" ? "selected" : "" %>
+            >
+                New
+            </option>
+
+            <option
+                value="Read"
+                <%= query.status === "Read" ? "selected" : "" %>
+            >
+                Read
+            </option>
+
+            <option
+                value="Replied"
+                <%= query.status === "Replied" ? "selected" : "" %>
+            >
+                Replied
+            </option>
+
+        </select>
+
+    </form>
+
+</td>
+                                <td>
+                                    <%= query.created_at %>
+                                </td>
+<td>
+
+    <form
+        action="/admin/queries/<%= query.id %>/delete"
+        method="POST"
+        onsubmit="return confirm('Are you sure you want to delete this query?');"
+    >
+
+        <button
+            type="submit"
+            style="
+                background: #dc2626;
+                color: white;
+                border: none;
+                padding: 7px 12px;
+                border-radius: 5px;
+                cursor: pointer;
+            "
+        >
+            Delete
+        </button>
+
+    </form>
+
+</td>
+                            </tr>
+
+                        <% }) %>
+
+                    </tbody>
+
+                </table>
+
+            <% } %>
+
+        </div>
+
+    </div>
+
+</body>
+</html>
